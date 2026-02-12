@@ -569,83 +569,98 @@ class _AssetHomeState extends State<AssetHome> {
                                 ],
                               ),
 
-                              const Divider(height: 18),
-
                               const Divider(height: 18, thickness: .8),
 
                               //////////////////////////////////////////////////////
                               /// TABLE
                               //////////////////////////////////////////////////////
                               Expanded(
-                                child: SingleChildScrollView(
-                                  scrollDirection: isSmallScreen
-                                      ? Axis.horizontal
-                                      : Axis.vertical,
-                                  child: ConstrainedBox(
-                                    constraints: BoxConstraints(
-                                      minWidth: MediaQuery.of(
-                                        context,
-                                      ).size.width,
-                                    ),
-                                    child: Table(
-                                      key: ValueKey(filteredAssets.length),
-                                      border: TableBorder.all(
-                                        color: Colors.grey.shade300,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: Colors.blueGrey.shade100,
                                       ),
-                                      defaultVerticalAlignment:
-                                          TableCellVerticalAlignment.middle,
-                                      columnWidths: const {
-                                        0: FixedColumnWidth(80),
-                                        1: FixedColumnWidth(200),
-                                        2: FixedColumnWidth(200),
-                                        3: FixedColumnWidth(200),
-                                        4: FixedColumnWidth(130),
-                                        5: FixedColumnWidth(130),
-                                        6: FixedColumnWidth(100),
-                                        7: FixedColumnWidth(80),
-                                        8: FixedColumnWidth(80),
-                                        9: FixedColumnWidth(100),
-                                        10: FixedColumnWidth(50),
-                                        11: FixedColumnWidth(80),
-                                      },
-                                      children: [
-                                        headerRow(),
-                                        ...pagedAssets.asMap().entries.map((
-                                          entry,
-                                        ) {
-                                          final a = entry.value;
-                                          return row([
-                                            a["id"],
-                                            a["barcode"],
-                                            a["name"],
-                                            a["category"],
-                                            a["selling_price"] ?? 0,
-                                            a["purchase_price"] ?? 0,
-                                            a["uom"],
-                                            a["op_stock"] ?? 0,
-                                            a["current_stock"] ?? 0,
-                                            a["tax"],
-                                            IconButton(
-                                              padding: EdgeInsets.zero,
-                                              icon: const Icon(
-                                                Icons.edit,
-                                                size: 20,
-                                              ),
-                                              onPressed: () => openEdit(a),
+                                    ),
+                                    child: SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: ConstrainedBox(
+                                        constraints: BoxConstraints(
+                                          minWidth: isSmallScreen
+                                              ? 1350
+                                              : constraints.maxWidth - 70,
+                                        ),
+                                        child: Table(
+                                          key: ValueKey(filteredAssets.length),
+                                          border: TableBorder(
+                                            horizontalInside: BorderSide(
+                                              color: Colors.blueGrey.shade50,
                                             ),
-                                            IconButton(
-                                              padding: EdgeInsets.zero,
-                                              icon: const Icon(
-                                                Icons.delete,
-                                                size: 20,
-                                                color: Colors.red,
-                                              ),
-                                              onPressed: () =>
-                                                  deleteItem(a["id"]),
+                                            verticalInside: BorderSide(
+                                              color: Colors.blueGrey.shade50,
                                             ),
-                                          ]);
-                                        }),
-                                      ],
+                                          ),
+                                          defaultVerticalAlignment:
+                                              TableCellVerticalAlignment
+                                                  .middle,
+                                          columnWidths: const {
+                                            0: FixedColumnWidth(80),
+                                            1: FixedColumnWidth(200),
+                                            2: FixedColumnWidth(200),
+                                            3: FixedColumnWidth(200),
+                                            4: FixedColumnWidth(130),
+                                            5: FixedColumnWidth(130),
+                                            6: FixedColumnWidth(130),
+                                            7: FixedColumnWidth(90),
+                                            8: FixedColumnWidth(110),
+                                            9: FixedColumnWidth(110),
+                                            10: FixedColumnWidth(70),
+                                            11: FixedColumnWidth(80),
+                                          },
+                                          children: [
+                                            headerRow(),
+                                            ...pagedAssets.asMap().entries.map((
+                                              entry,
+                                            ) {
+                                              final a = entry.value;
+                                              return row(
+                                                [
+                                                  a["id"],
+                                                  a["barcode"],
+                                                  a["name"],
+                                                  a["category"],
+                                                  a["selling_price"] ?? 0,
+                                                  a["purchase_price"] ?? 0,
+                                                  a["uom"],
+                                                  a["op_stock"] ?? 0,
+                                                  a["current_stock"] ?? 0,
+                                                  a["tax"],
+                                                  IconButton(
+                                                    padding: EdgeInsets.zero,
+                                                    icon: const Icon(
+                                                      Icons.edit,
+                                                      size: 20,
+                                                    ),
+                                                    onPressed: () => openEdit(a),
+                                                  ),
+                                                  IconButton(
+                                                    padding: EdgeInsets.zero,
+                                                    icon: const Icon(
+                                                      Icons.delete,
+                                                      size: 20,
+                                                      color: Colors.red,
+                                                    ),
+                                                    onPressed: () =>
+                                                        deleteItem(a["id"]),
+                                                  ),
+                                                ],
+                                                index: entry.key,
+                                              );
+                                            }),
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -770,19 +785,28 @@ class _AssetHomeState extends State<AssetHome> {
     ], header: true);
   }
 
-  TableRow row(List<dynamic> cells, {bool header = false}) {
+  TableRow row(List<dynamic> cells, {bool header = false, int? index}) {
     return TableRow(
-      decoration: header ? const BoxDecoration(color: Color(0xFFECEFF1)) : null,
+      decoration: BoxDecoration(
+        color: header
+            ? const Color(0xFFE3F2FD)
+            : (index != null && index.isEven
+                  ? Colors.white
+                  : const Color(0xFFFAFBFC)),
+      ),
       children: cells
           .map(
             (e) => Padding(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
               child: e is Widget
                   ? e
                   : SelectableText(
                       "$e",
                       style: header
-                          ? const TextStyle(fontWeight: FontWeight.bold)
+                          ? const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF0D47A1),
+                            )
                           : null,
                     ),
             ),
