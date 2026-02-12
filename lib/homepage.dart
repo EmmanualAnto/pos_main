@@ -415,196 +415,259 @@ class _AssetHomeState extends State<AssetHome> {
                 final isSmallScreen = constraints.maxWidth < 1000;
 
                 Widget tableWidget = Container(
-                  width: double.infinity,
-                  color: Colors.grey.shade100,
+                  color: Colors.grey.shade100, // page background
                   child: Column(
                     children: [
                       ////////////////////////////////////////////////////////////
-                      /// FILTER BAR (compact)
+                      /// SEARCH SECTION (professional card)
                       ////////////////////////////////////////////////////////////
                       Container(
-                        width: double.infinity,
-                        margin: const EdgeInsets.all(16),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
+                        margin: const EdgeInsets.fromLTRB(20, 16, 20, 10),
+                        padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey.shade300),
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(.04),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
-                        child: Row(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(
-                              child: Wrap(
-                                spacing: 8,
-                                runSpacing: 8,
+                            const Text(
+                              "Search Filters",
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
                                 children: [
                                   buildSearchField(
                                     controller: barcodeSearchCtrl,
                                     label: "Barcode",
-                                    width: 140,
+                                    width: 170,
                                   ),
+                                  const SizedBox(width: 12),
                                   buildSearchField(
                                     controller: nameSearchCtrl,
                                     label: "Name",
-                                    width: 160,
+                                    width: 200,
                                   ),
+                                  const SizedBox(width: 12),
                                   buildSearchField(
                                     controller: categorySearchCtrl,
                                     label: "Category",
-                                    width: 160,
+                                    width: 200,
                                   ),
+                                  const SizedBox(width: 12),
                                   buildSearchField(
                                     controller: taxSearchCtrl,
                                     label: "Tax",
-                                    width: 110,
+                                    width: 150,
+                                  ),
+                                  const SizedBox(width: 16),
+
+                                  OutlinedButton.icon(
+                                    onPressed: () {
+                                      barcodeSearchCtrl.clear();
+                                      nameSearchCtrl.clear();
+                                      categorySearchCtrl.clear();
+                                      taxSearchCtrl.clear();
+                                      setState(() {
+                                        filteredAssets = List.from(assets);
+                                        currentPage = 0;
+                                      });
+                                    },
+                                    icon: const Icon(Icons.refresh),
+                                    label: const Text("Reset"),
                                   ),
                                 ],
                               ),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                barcodeSearchCtrl.clear();
-                                nameSearchCtrl.clear();
-                                categorySearchCtrl.clear();
-                                taxSearchCtrl.clear();
-
-                                setState(() {
-                                  filteredAssets = List.from(assets);
-                                  currentPage = 0;
-                                });
-                              },
-                              child: const Text("Clear"),
                             ),
                           ],
                         ),
                       ),
 
                       ////////////////////////////////////////////////////////////
-                      /// TABLE CARD
+                      /// TABLE SECTION (main professional container)
                       ////////////////////////////////////////////////////////////
                       Expanded(
                         child: Container(
-                          width: double.infinity,
-                          margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                          margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.grey.shade300),
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(.04),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
                           child: Column(
                             children: [
-                              ////////////////////////////////////////////////////////
-                              /// HEADER (counts left + add button right)
-                              ////////////////////////////////////////////////////////
+                              //////////////////////////////////////////////////////
+                              /// small header bar
+                              //////////////////////////////////////////////////////
+                              /// PAGINATION HEADER
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    "Showing ${filteredAssets.isEmpty ? 0 : currentPage * rowsPerPage + 1}"
-                                    "–${currentPage * rowsPerPage + pagedAssets.length} of ${filteredAssets.length}",
+                                  const Text(
+                                    "Items List",
                                     style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey.shade700,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
 
-                                  ElevatedButton.icon(
-                                    icon: const Icon(Icons.add, size: 18),
-                                    label: const Text("Add Item"),
-                                    onPressed: () => openAdd(), // your function
+                                  Wrap(
+                                    spacing: 6,
+                                    children: List.generate(totalPages, (
+                                      index,
+                                    ) {
+                                      final selected = index == currentPage;
+
+                                      return InkWell(
+                                        onTap: () {
+                                          setState(() => currentPage = index);
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 6,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: selected
+                                                ? Colors.grey.shade300
+                                                : Colors.grey.shade100,
+                                            borderRadius: BorderRadius.circular(
+                                              6,
+                                            ),
+                                            border: Border.all(
+                                              color: Colors.grey.shade300,
+                                            ),
+                                          ),
+                                          child: Text("${index + 1}"),
+                                        ),
+                                      );
+                                    }),
                                   ),
                                 ],
                               ),
 
-                              const SizedBox(height: 10),
-                              const Divider(height: 1),
+                              const Divider(height: 18),
 
-                              ////////////////////////////////////////////////////////
-                              /// TABLE (NO SCROLL ANYWHERE)
-                              ////////////////////////////////////////////////////////
+                              const Divider(height: 18, thickness: .8),
+
+                              //////////////////////////////////////////////////////
+                              /// TABLE
+                              //////////////////////////////////////////////////////
                               Expanded(
-                                child: Table(
-                                  key: ValueKey(filteredAssets.length),
-                                  border: TableBorder.symmetric(
-                                    inside: BorderSide(
-                                      color: Colors.grey.shade200,
+                                child: SingleChildScrollView(
+                                  scrollDirection: isSmallScreen
+                                      ? Axis.horizontal
+                                      : Axis.vertical,
+                                  child: ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                      minWidth: MediaQuery.of(
+                                        context,
+                                      ).size.width,
                                     ),
-                                  ),
-                                  defaultVerticalAlignment:
-                                      TableCellVerticalAlignment.middle,
-
-                                  /// auto-fit columns
-                                  columnWidths: const {
-                                    0: FlexColumnWidth(.6),
-                                    1: FlexColumnWidth(1.2),
-                                    2: FlexColumnWidth(1.6),
-                                    3: FlexColumnWidth(1.4),
-                                    4: FlexColumnWidth(1),
-                                    5: FlexColumnWidth(1),
-                                    6: FlexColumnWidth(.8),
-                                    7: FlexColumnWidth(.8),
-                                    8: FlexColumnWidth(.9),
-                                    9: FlexColumnWidth(.7),
-                                    10: FlexColumnWidth(.5),
-                                    11: FlexColumnWidth(.5),
-                                  },
-
-                                  children: [
-                                    headerRow(),
-
-                                    ...pagedAssets.map(
-                                      (a) => row([
-                                        a["id"],
-                                        a["barcode"],
-                                        a["name"],
-                                        a["category"],
-                                        a["selling_price"] ?? 0,
-                                        a["purchase_price"] ?? 0,
-                                        a["uom"],
-                                        a["op_stock"] ?? 0,
-                                        a["current_stock"] ?? 0,
-                                        a["tax"],
-                                        IconButton(
-                                          icon: const Icon(
-                                            Icons.edit,
-                                            size: 18,
-                                          ),
-                                          onPressed: () => openEdit(a),
-                                        ),
-                                        IconButton(
-                                          icon: const Icon(
-                                            Icons.delete,
-                                            size: 18,
-                                            color: Colors.red,
-                                          ),
-                                          onPressed: () => deleteItem(a["id"]),
-                                        ),
-                                      ]),
+                                    child: Table(
+                                      key: ValueKey(filteredAssets.length),
+                                      border: TableBorder.all(
+                                        color: Colors.grey.shade300,
+                                      ),
+                                      defaultVerticalAlignment:
+                                          TableCellVerticalAlignment.middle,
+                                      columnWidths: const {
+                                        0: FixedColumnWidth(80),
+                                        1: FixedColumnWidth(200),
+                                        2: FixedColumnWidth(200),
+                                        3: FixedColumnWidth(200),
+                                        4: FixedColumnWidth(130),
+                                        5: FixedColumnWidth(130),
+                                        6: FixedColumnWidth(100),
+                                        7: FixedColumnWidth(80),
+                                        8: FixedColumnWidth(80),
+                                        9: FixedColumnWidth(100),
+                                        10: FixedColumnWidth(50),
+                                        11: FixedColumnWidth(80),
+                                      },
+                                      children: [
+                                        headerRow(),
+                                        ...pagedAssets.asMap().entries.map((
+                                          entry,
+                                        ) {
+                                          final a = entry.value;
+                                          return row([
+                                            a["id"],
+                                            a["barcode"],
+                                            a["name"],
+                                            a["category"],
+                                            a["selling_price"] ?? 0,
+                                            a["purchase_price"] ?? 0,
+                                            a["uom"],
+                                            a["op_stock"] ?? 0,
+                                            a["current_stock"] ?? 0,
+                                            a["tax"],
+                                            IconButton(
+                                              padding: EdgeInsets.zero,
+                                              icon: const Icon(
+                                                Icons.edit,
+                                                size: 20,
+                                              ),
+                                              onPressed: () => openEdit(a),
+                                            ),
+                                            IconButton(
+                                              padding: EdgeInsets.zero,
+                                              icon: const Icon(
+                                                Icons.delete,
+                                                size: 20,
+                                                color: Colors.red,
+                                              ),
+                                              onPressed: () =>
+                                                  deleteItem(a["id"]),
+                                            ),
+                                          ]);
+                                        }),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                              ),
-
-                              ////////////////////////////////////////////////////////
-                              /// FOOTER (page info bottom-left)
-                              ////////////////////////////////////////////////////////
-                              const SizedBox(height: 8),
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  "Page ${currentPage + 1} of $totalPages",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey.shade600,
                                   ),
                                 ),
                               ),
                             ],
+                          ),
+                        ),
+                      ),
+
+                      /// FOOTER INFO
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            "Showing ${filteredAssets.isEmpty ? 0 : currentPage * rowsPerPage + 1}"
+                            "–${(currentPage * rowsPerPage + pagedAssets.length)} "
+                            "of ${filteredAssets.length} entries",
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 12,
+                            ),
                           ),
                         ),
                       ),
@@ -640,6 +703,7 @@ class _AssetHomeState extends State<AssetHome> {
             labelText: label,
             prefixIcon: icon != null ? Icon(icon) : null,
             border: InputBorder.none,
+            isDense: true,
           ),
         ),
       ),
@@ -681,9 +745,8 @@ class _AssetHomeState extends State<AssetHome> {
         decoration: InputDecoration(labelText: label),
         validator: (v) {
           if (v == null || v.trim().isEmpty) return "Required";
-          if (number && double.tryParse(v.trim()) == null) {
+          if (number && double.tryParse(v.trim()) == null)
             return "Numbers only";
-          }
           return null;
         },
       ),
